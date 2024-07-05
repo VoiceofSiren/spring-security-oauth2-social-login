@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HomeController {
 
+    /**
+     *  인증 완료 후 접근 가능
+     *      - 권한 검사
+     *      SecurityFilterChain -> http.requestMatchers("/api/user/").hasAnyRole("SCOPE_profile", "SCOPE_email")...
+     */
     @GetMapping("/api/user")
     public Authentication user(Authentication authentication, @AuthenticationPrincipal OAuth2User oAuth2User) {
         System.out.println("authentication = " + authentication + ", oAuth2User = " + oAuth2User);
