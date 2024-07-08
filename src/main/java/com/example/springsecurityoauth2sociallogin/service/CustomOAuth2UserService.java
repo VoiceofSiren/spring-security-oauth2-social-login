@@ -1,5 +1,6 @@
 package com.example.springsecurityoauth2sociallogin.service;
 
+import com.example.springsecurityoauth2sociallogin.converters.ProviderUserRequest;
 import com.example.springsecurityoauth2sociallogin.model.ProviderUser;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -19,8 +20,10 @@ public class CustomOAuth2UserService extends AbstractOAuth2UserService implement
         OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
 
+        ProviderUserRequest providerUserRequest = new ProviderUserRequest(clientRegistration, oAuth2User);
+
         // 반환하고자 하는 계정의 타입을 지정
-        ProviderUser providerUser = super.providerUser(clientRegistration, oAuth2User);
+        ProviderUser providerUser = providerUser(providerUserRequest);
 
         // 회원 가입
         super.register(providerUser, userRequest);

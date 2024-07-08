@@ -1,6 +1,12 @@
 package com.example.springsecurityoauth2sociallogin.service;
 
+import com.example.springsecurityoauth2sociallogin.converters.ProviderUserConverter;
+import com.example.springsecurityoauth2sociallogin.converters.ProviderUserRequest;
 import com.example.springsecurityoauth2sociallogin.model.*;
+import com.example.springsecurityoauth2sociallogin.model.social.GoogleUser;
+import com.example.springsecurityoauth2sociallogin.model.social.KeycloakUser;
+import com.example.springsecurityoauth2sociallogin.model.social.NaverUser;
+import com.example.springsecurityoauth2sociallogin.model.users.User;
 import com.example.springsecurityoauth2sociallogin.repository.UserRepository;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +23,8 @@ public abstract class AbstractOAuth2UserService {
     private UserRepository userRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ProviderUserConverter<ProviderUserRequest, ProviderUser> providerUserConverter;
 
     public void register(ProviderUser providerUser, OAuth2UserRequest userRequest) {
 
@@ -31,18 +39,9 @@ public abstract class AbstractOAuth2UserService {
 
     }
 
-    public ProviderUser providerUser(ClientRegistration clientRegistration, OAuth2User oAuth2User) {
+    public ProviderUser providerUser(ProviderUserRequest providerUserRequest) {
 
-        String registrationId = clientRegistration.getRegistrationId();
-
-        if (registrationId.equals("keycloak")) {
-            return new KeycloakUser(oAuth2User, clientRegistration);
-        } else if (registrationId.equals("google")) {
-            return new GoogleUser(oAuth2User, clientRegistration);
-        } else if (registrationId.equals("naver")) {
-            return new NaverUser(oAuth2User, clientRegistration);
-        }
-        return null;
+        return providerUserConverter.converter(providerUserRequest);
 
     }
 

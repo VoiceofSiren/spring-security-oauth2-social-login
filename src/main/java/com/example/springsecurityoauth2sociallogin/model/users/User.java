@@ -1,4 +1,4 @@
-package com.example.springsecurityoauth2sociallogin.model;
+package com.example.springsecurityoauth2sociallogin.model.users;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,10 +1,9 @@
 package com.example.springsecurityoauth2sociallogin.service;
 
 import com.example.springsecurityoauth2sociallogin.model.ProviderUser;
-import com.example.springsecurityoauth2sociallogin.model.User;
+import com.example.springsecurityoauth2sociallogin.model.users.User;
 import com.example.springsecurityoauth2sociallogin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.stereotype.Service;
 
 @Service
