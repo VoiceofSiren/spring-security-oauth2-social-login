@@ -1,5 +1,7 @@
-package com.example.springsecurityoauth2sociallogin.model;
+package com.example.springsecurityoauth2sociallogin.model.social;
 
+import com.example.springsecurityoauth2sociallogin.model.ProviderUser;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -10,12 +12,17 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Data
 public abstract class OAuth2ProviderUser implements ProviderUser {
-    private final Map<String, Object> attributes;
-    private final OAuth2User oAuth2User;
-    private final ClientRegistration clientRegistration;
 
-    public OAuth2ProviderUser(Map<String, Object> attributes, OAuth2User oAuth2User, ClientRegistration clientRegistration) {
+    //
+    private Map<String, Object> attributes;
+    //
+    private OAuth2User oAuth2User;
+    private ClientRegistration clientRegistration;
+    private boolean isCertificated;
+
+    public OAuth2ProviderUser(Map<String, Object> attributes, OAuth2User oAuth2User, ClientRegistration clientRegistration){
         this.attributes = attributes;
         this.oAuth2User = oAuth2User;
         this.clientRegistration = clientRegistration;
@@ -28,12 +35,12 @@ public abstract class OAuth2ProviderUser implements ProviderUser {
 
     @Override
     public String getEmail() {
-        return clientRegistration.getRegistrationId();
+        return (String)attributes.get("email");
     }
 
     @Override
     public String getProvider() {
-        return (String) getAttributes().get("email");
+        return clientRegistration.getRegistrationId();
     }
 
     @Override
@@ -44,7 +51,12 @@ public abstract class OAuth2ProviderUser implements ProviderUser {
     }
 
     @Override
-    public Map<String, Object> getAttributes() {
-        return this.attributes;
+    public boolean isCertificated() {
+        return isCertificated;
+    }
+
+    @Override
+    public void isCertificated(boolean isCertificated) {
+        this.isCertificated = isCertificated;
     }
 }

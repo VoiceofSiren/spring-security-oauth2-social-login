@@ -1,4 +1,4 @@
-package com.example.springsecurityoauth2sociallogin.converters;
+package com.example.springsecurityoauth2sociallogin.common.converters;
 
 public interface ProviderUserConverter<T, R> {
 

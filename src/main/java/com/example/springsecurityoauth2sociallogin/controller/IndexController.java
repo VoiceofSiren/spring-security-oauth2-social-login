@@ -1,5 +1,7 @@
 package com.example.springsecurityoauth2sociallogin.controller;
 
+import com.example.springsecurityoauth2sociallogin.common.util.OAuth2Utils;
+import com.example.springsecurityoauth2sociallogin.model.PrincipalUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -15,24 +17,29 @@ import java.util.Map;
 public class IndexController {
 
     @GetMapping("/")
-    public String index(Model model, Authentication authentication,  @AuthenticationPrincipal OAuth2User oAuth2User){
+    public String index(Model model, Authentication authentication, @AuthenticationPrincipal PrincipalUser principalUser){
 
-        OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken) authentication;
+        String view = "index";
 
-        if(authenticationToken != null){
-            // [1] 사용자의 속성을 가져옴.
-            Map<String, Object> attributes = oAuth2User.getAttributes();
-            String userName = (String) attributes.get("name");
+        if (authentication != null){
 
-            // [2] 네이버의 경우에는 response 층 아래에 name 키가 있음.
-            if(authenticationToken.getAuthorizedClientRegistrationId().equals("naver")){
-                Map<String, Object> response = (Map)attributes.get("response");
-                userName = (String)response.get("name");
+            String userName;
+
+            // 1) OAuth2 인증일 경우
+            if (authentication instanceof OAuth2AuthenticationToken) {
+                userName = OAuth2Utils.oAuth2UserName((OAuth2AuthenticationToken) authentication, principalUser);
             }
-            // [3] mode에 username을 추가.
+            // 2) Form 인증일 경우
+            else {
+                userName = principalUser.providerUser().getUsername();
+            }
+
             model.addAttribute("user", userName);
+            model.addAttribute("provider", principalUser.providerUser().getProvider());
+
+            if(!principalUser.providerUser().isCertificated()) view = "selfcert";
         }
-        return "index";
+        return view;
     }
 
 }

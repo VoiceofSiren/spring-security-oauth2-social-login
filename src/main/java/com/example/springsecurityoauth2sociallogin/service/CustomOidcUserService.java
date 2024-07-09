@@ -1,7 +1,11 @@
 package com.example.springsecurityoauth2sociallogin.service;
 
-import com.example.springsecurityoauth2sociallogin.converters.ProviderUserRequest;
+import com.example.springsecurityoauth2sociallogin.certification.SelfCertification;
+import com.example.springsecurityoauth2sociallogin.common.converters.ProviderUserConverter;
+import com.example.springsecurityoauth2sociallogin.common.converters.ProviderUserRequest;
+import com.example.springsecurityoauth2sociallogin.model.PrincipalUser;
 import com.example.springsecurityoauth2sociallogin.model.ProviderUser;
+import com.example.springsecurityoauth2sociallogin.repository.UserRepository;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -15,18 +19,27 @@ public class CustomOidcUserService extends AbstractOAuth2UserService implements 
 
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
-        ClientRegistration clientRegistration = userRequest.getClientRegistration();
+
+        // Open ID Connect 인 경우 User name Attribute Key 가 sub 이기 때문에 재정의함
+        ClientRegistration clientRegistration = ClientRegistration
+                .withClientRegistration(userRequest.getClientRegistration())
+                .userNameAttributeName("sub")
+                .build();
+
+        OidcUserRequest oidcUserRequest =
+                new OidcUserRequest(clientRegistration, userRequest.getAccessToken(),
+                        userRequest.getIdToken(), userRequest.getAdditionalParameters());
+
         OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService = new OidcUserService();
-        OidcUser oidcUser = oidcUserService.loadUser(userRequest);
+        OidcUser oidcUser = oidcUserService.loadUser(oidcUserRequest);
 
         ProviderUserRequest providerUserRequest = new ProviderUserRequest(clientRegistration,oidcUser);
+        ProviderUser providerUser = providerUser(providerUserRequest);
 
-        // 반환하고자 하는 계정의 타입을 지정
-        ProviderUser providerUser = super.providerUser(providerUserRequest);
+        selfCertificate(providerUser);
 
-        // 회원 가입
-        super.register(providerUser, userRequest);
+        super.register(providerUser, oidcUserRequest);
 
-        return oidcUser;
+        return new PrincipalUser(providerUser);
     }
 }

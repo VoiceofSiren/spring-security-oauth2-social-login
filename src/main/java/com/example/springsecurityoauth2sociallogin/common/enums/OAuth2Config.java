@@ -1,4 +1,4 @@
-package com.example.springsecurityoauth2sociallogin.enums;
+package com.example.springsecurityoauth2sociallogin.common.enums;
 
 public class OAuth2Config {
 

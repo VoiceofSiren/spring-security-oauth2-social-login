@@ -1,4 +1,4 @@
-package com.example.springsecurityoauth2sociallogin.converters;
+package com.example.springsecurityoauth2sociallogin.common.converters;
 
 import com.example.springsecurityoauth2sociallogin.model.ProviderUser;
 import org.springframework.stereotype.Component;
@@ -16,8 +16,10 @@ public class DelegatingProviderUserConverter implements ProviderUserConverter<Pr
 
     public DelegatingProviderUserConverter() {
         List<ProviderUserConverter<ProviderUserRequest, ProviderUser>> providerUserConverters =
-                Arrays.asList(new OAuth2GoogleProviderUserConverter(),
-                              new OAuth2NaverProviderUserConverter());
+                Arrays.asList(new UserDetailsProviderUserConverter(),
+                              new OAuth2GoogleProviderUserConverter(),
+                              new OAuth2NaverProviderUserConverter(),
+                              new OAuth2KakaoProviderUserConverter());
 
         this.converters = Collections.unmodifiableList(new LinkedList<>(providerUserConverters));
     }
